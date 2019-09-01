@@ -1,5 +1,5 @@
 use std::env;
-use todo_rs::db::{create_task, establish_connection};
+use todo_rs::db::{query_task, create_task, establish_connection};
 
 fn help() {
     println!("subcommands");
@@ -17,6 +17,21 @@ fn new_task(args: &[String]) {
     create_task(&conn, &args[0]);
 }
 
+fn show_tasks(args: &[String]) {
+    if args.len() > 0 {
+        println!("show: unexpected argument");
+        help();
+        return;
+    }
+
+    let conn = establish_connection();
+    println!("TASKS\n-----");
+    for task in query_task(&conn) {
+        println!("{}", task.title);
+        
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -28,6 +43,7 @@ fn main() {
     let subcommand = &args[1];
     match subcommand.as_ref() {
         "new" => new_task(&args[2..]),
+        "show" => show_tasks(&args[2..]),
         _ => help(),
         
     }
