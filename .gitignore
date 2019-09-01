@@ -1,3 +1,7 @@
 /target
 **/*.rs.bk
 Cargo.lock
+.env
+diesel.toml
+migrations/
+testdb.sqlite3
