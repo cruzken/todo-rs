@@ -1,3 +1,4 @@
+use todo_rs::db::{query_task, establish_connection};
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
 fn index() -> impl Responder {
@@ -5,7 +6,13 @@ fn index() -> impl Responder {
 }
 
 fn tasks_get() -> impl Responder {
-    HttpResponse::Ok().body("listing tasks\n")
+    let mut response: Vec<String> = vec![];
+
+    let conn = establish_connection();
+    for task in query_task(&conn) {
+        response.push(task.title);
+    }
+    HttpResponse::Ok().body(response.join("\n"))
 }
 
 fn main() {
