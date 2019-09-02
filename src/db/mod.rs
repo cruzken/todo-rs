@@ -29,8 +29,23 @@ pub fn done_update_task(connection: &SqliteConnection, id: i32) {
     let done_task: models::Task = task
             .find(id)
             .first(connection)
-            .unwrap_or_else(|_| panic!("Unable to find post {}", id));
+            .unwrap_or_else(|_| panic!("Unable to find task {}", id));
     println!("Done task: {}", done_task.title);
+}
+
+pub fn del_task(connection: &SqliteConnection, id: i32) {
+    use super::db::schema::task::dsl::{task};
+
+    let del_task: models::Task = task
+            .find(id)
+            .first(connection)
+            .unwrap_or_else(|_| panic!("Unable to find task {}", id));
+
+    let _ = diesel::delete(task.find(id))
+        .execute(connection)
+        .unwrap_or_else(|_| panic!("Unable to find task {}", id));
+
+    println!("Deleted task: {}", del_task.title);
 }
 
 pub fn query_task(connection: &SqliteConnection) -> Vec<models::Task> {

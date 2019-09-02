@@ -1,11 +1,12 @@
 use std::env;
-use todo_rs::db::{done_update_task, query_task, create_task, establish_connection};
+use todo_rs::db::{del_task, done_update_task, query_task, create_task, establish_connection};
 
 fn help() {
     println!("subcommands");
     println!("    new<title>: create a new task");
     println!("    show: show all tasks");
     println!("    done<id>: mark task done");
+    println!("    delete<id>: delete task");
 }
 
 fn new_task(args: &[String]) {
@@ -52,6 +53,20 @@ fn done_task(args: &[String]) {
     done_update_task(&conn, *id);
 }
 
+fn delete_task(args: &[String]) {
+    if args.len() < 1 {
+        println!("done: missing argument");
+        help();
+        return;
+    }
+
+    let id = &args[0]
+        .parse::<i32>().expect("Invalid ID");
+
+    let conn = establish_connection();
+    del_task(&conn, *id);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -65,6 +80,7 @@ fn main() {
         "new" => new_task(&args[2..]),
         "show" => show_tasks(&args[2..]),
         "done" => done_task(&args[2..]),
+        "delete" => delete_task(&args[2..]),
         _ => help(),
         
     }
