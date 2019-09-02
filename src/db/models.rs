@@ -1,4 +1,5 @@
 use super::schema::task;
+use serde::Serialize;
 
 #[derive(Insertable)]
 #[table_name = "task"]
@@ -7,7 +8,7 @@ pub struct NewTask<'a> {
     pub done: i32,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
 pub struct Task {
     pub id: i32,
     pub title: String,

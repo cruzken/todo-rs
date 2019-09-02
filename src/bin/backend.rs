@@ -1,18 +1,23 @@
-use todo_rs::db::{query_task, establish_connection};
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use serde::Serialize;
+use todo_rs::db::{establish_connection, models::Task, query_task};
+
+#[derive(Serialize)]
+struct JsonApiResponse {
+    data: Vec<Task>,
+}
 
 fn index() -> impl Responder {
     HttpResponse::Ok().body("index\n")
 }
 
 fn tasks_get() -> impl Responder {
-    let mut response: Vec<String> = vec![];
-
+    let mut response = JsonApiResponse { data: vec![] };
     let conn = establish_connection();
     for task in query_task(&conn) {
-        response.push(task.title);
+        response.data.push(task);
     }
-    HttpResponse::Ok().body(response.join("\n"))
+    HttpResponse::Ok().json(response)
 }
 
 fn main() {
