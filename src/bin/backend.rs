@@ -1,11 +1,6 @@
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use serde::Serialize;
-use todo_rs::db::{establish_connection, models::Task, query_task};
+use todo_rs::db::{models::{JsonApiResponse, TaskJson}, establish_connection, query_task};
 
-#[derive(Serialize)]
-struct JsonApiResponse {
-    data: Vec<Task>,
-}
 
 fn index() -> impl Responder {
     HttpResponse::Ok().body("index\n")
@@ -15,7 +10,7 @@ fn tasks_get() -> impl Responder {
     let mut response = JsonApiResponse { data: vec![] };
     let conn = establish_connection();
     for task in query_task(&conn) {
-        response.data.push(task);
+        response.data.push(TaskJson::new(task));
     }
     HttpResponse::Ok().json(response)
 }

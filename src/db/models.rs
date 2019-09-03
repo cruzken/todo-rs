@@ -14,3 +14,31 @@ pub struct Task {
     pub title: String,
     pub done: i32,
 }
+
+#[derive(Serialize)]
+pub struct JsonApiResponse {
+    pub data: Vec<TaskJson>,
+}
+
+#[derive(Serialize)]
+pub struct TaskJson {
+    pub id: i32,
+    #[serde(rename = "type")]
+    pub type_json: String,
+    pub attributes: TaskTitle
+}
+
+impl TaskJson {
+    pub fn new(task: Task) -> TaskJson {
+        TaskJson {
+            id: task.id,
+            type_json: "Task".into(),
+            attributes: TaskTitle { title: task.title }
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct TaskTitle {
+    pub title: String,
+}
