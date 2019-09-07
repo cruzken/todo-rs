@@ -25,7 +25,7 @@ pub struct TaskJson {
     pub id: i32,
     #[serde(rename = "type")]
     pub type_json: String,
-    pub attributes: TaskTitle
+    pub attributes: TaskAttributes
 }
 
 impl TaskJson {
@@ -33,12 +33,13 @@ impl TaskJson {
         TaskJson {
             id: task.id,
             type_json: "Task".into(),
-            attributes: TaskTitle { title: task.title }
+            attributes: TaskAttributes { title: task.title, done: task.done}
         }
     }
 }
 
 #[derive(Serialize)]
-pub struct TaskTitle {
+pub struct TaskAttributes {
     pub title: String,
+    pub done: i32,
 }
