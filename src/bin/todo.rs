@@ -1,5 +1,5 @@
 use std::env;
-use todo_rs::db::{del_task, done_update_task, query_task, create_task, establish_connection};
+use todo_rs::db::{create_task, del_task, done_update_task, establish_connection, query_task};
 
 fn help() {
     println!("subcommands");
@@ -17,7 +17,7 @@ fn new_task(args: &[String]) {
     }
 
     let conn = establish_connection();
-    create_task(&conn, &args[0]);
+    create_task(&conn, &args[0]).unwrap();
 }
 
 fn show_tasks(args: &[String]) {
@@ -29,7 +29,7 @@ fn show_tasks(args: &[String]) {
 
     let conn = establish_connection();
     println!("TASKS\n-----");
-    for task in query_task(&conn) {
+    for task in query_task(&conn).unwrap() {
         let status = match task.done {
             0 => "Pending",
             1 => "Done",
@@ -46,8 +46,7 @@ fn done_task(args: &[String]) {
         return;
     }
 
-    let id = &args[0]
-        .parse::<i32>().expect("Invalid ID");
+    let id = &args[0].parse::<i32>().expect("Invalid ID");
 
     let conn = establish_connection();
     done_update_task(&conn, *id);
@@ -60,8 +59,7 @@ fn delete_task(args: &[String]) {
         return;
     }
 
-    let id = &args[0]
-        .parse::<i32>().expect("Invalid ID");
+    let id = &args[0].parse::<i32>().expect("Invalid ID");
 
     let conn = establish_connection();
     del_task(&conn, *id);
@@ -82,6 +80,5 @@ fn main() {
         "done" => done_task(&args[2..]),
         "delete" => delete_task(&args[2..]),
         _ => help(),
-        
     }
 }

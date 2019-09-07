@@ -21,13 +21,15 @@ pub fn establish_connection() -> SqliteConnection {
     SqliteConnection::establish(db).unwrap_or_else(|_| panic!("Error connecting to {}", db))
 }
 
-pub fn create_task<'a>(connection: &SqliteConnection, title: &'a str) {
+pub fn create_task<'a>(
+    connection: &SqliteConnection,
+    title: &'a str,
+) -> Result<usize, diesel::result::Error> {
     let task = models::NewTask { title, done: 0 };
 
     diesel::insert_into(schema::task::table)
         .values(&task)
         .execute(connection)
-        .expect("Error inserting new task");
 }
 
 pub fn done_update_task(connection: &SqliteConnection, id: i32) {

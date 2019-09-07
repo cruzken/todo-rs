@@ -1,28 +1,32 @@
 use actix_web::{web, App, Error, HttpResponse, HttpServer};
 use futures::future::Future;
+use serde::Deserialize;
 use std::ops::Deref;
 use todo_rs::db::{
-    get_connect, init_pool,
+    create_task, get_connect, init_pool,
     models::{JsonApiResponse, TaskJson},
     query_task, SqlitePool,
 };
 
-fn index() -> impl Future<Item = HttpResponse, Error = Error> {
-    web::block(move || {
-        let result = HttpResponse::Ok().body("test");
-        if result.status().is_success() {
-            Ok("yup")
-        } else {
-            Err("uh oh")
-        }
-    })
-    .then(move |res| match res {
-        Ok(_) => Ok(HttpResponse::Ok().body("test\n")),
-        Err(_) => Ok(HttpResponse::Ok().body("unknown")),
-    })
+fn add_task(
+    pool: web::Data<SqlitePool>,
+    task: web::Json<JsonPostTask>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let pool = pool.clone();
+    web::block(move || create_task(get_connect(&pool).unwrap().deref(), &task.title)).then(
+        move |res| match res {
+            Ok(_) => Ok(HttpResponse::Ok().body("task added")),
+            Err(e) => Ok(HttpResponse::Ok().body(format!("error occured: {:?}", e))),
+        },
+    )
 }
 
-fn tasks_get(pool: web::Data<SqlitePool>) -> impl Future<Item = HttpResponse, Error = Error> {
+#[derive(Deserialize)]
+pub struct JsonPostTask {
+    pub title: String,
+}
+
+fn index(pool: web::Data<SqlitePool>) -> impl Future<Item = HttpResponse, Error = Error> {
     let pool = pool.clone();
 
     let mut response = JsonApiResponse { data: vec![] };
@@ -46,7 +50,7 @@ fn main() {
         App::new()
             .data(pool.clone())
             .service(web::resource("/").route(web::get().to_async(index)))
-            .service(web::resource("/tasks").route(web::get().to_async(tasks_get)))
+            .service(web::resource("/add").route(web::post().to_async(add_task)))
     };
 
     println!("Starting server");
