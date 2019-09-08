@@ -1,4 +1,5 @@
 use actix_web::{web, App, Error, HttpResponse, HttpServer};
+use actix_files as fs;
 use futures::future::Future;
 use serde::Deserialize;
 use std::ops::Deref;
@@ -51,7 +52,7 @@ pub struct JsonPostTask {
     pub title: String,
 }
 
-fn index(pool: web::Data<SqlitePool>) -> impl Future<Item = HttpResponse, Error = Error> {
+fn tasks(pool: web::Data<SqlitePool>) -> impl Future<Item = HttpResponse, Error = Error> {
     let pool = pool.clone();
 
     let mut response = JsonApiResponse { data: vec![] };
@@ -74,13 +75,14 @@ fn main() {
     let app = move || {
         App::new()
             .data(pool.clone())
-            .service(web::resource("/").route(web::get().to_async(index)))
+            .service(web::resource("/tasks").route(web::get().to_async(tasks)))
             .service(web::resource("/add").route(web::post().to_async(add_task)))
             .service(web::resource("/done/{id}").route(web::put().to_async(done_task)))
             .service(web::resource("/delete/{id}").route(web::delete().to_async(delete_task)))
+            .service(fs::Files::new("/", "./static").index_file("index.html"))
     };
 
-    println!("Starting server");
+    println!("Starting server at http://localhost:8088/");
     HttpServer::new(app)
         .bind("localhost:8088")
         .unwrap()

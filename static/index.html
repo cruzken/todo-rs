@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo App</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{ message }}
+
+    <ul>
+  <li v-for="task in tasks">
+      <p>{{ task.attributes.title}}</p>
+  </li>
+    </ul>
+  </div>
+
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Tasks Listed:',
+        tasks: []
+      },
+    mounted() {
+          axios.get("./tasks").then(response => {
+            this.tasks = response.data.data
+          })
+        }
+    })
+  </script>
+</body>
+</html>
