@@ -32,19 +32,22 @@ pub fn create_task<'a>(
         .execute(connection)
 }
 
-pub fn done_update_task(connection: &SqliteConnection, id: i32) {
+pub fn done_update_task(connection: &SqliteConnection, id: i32) -> Result<String, String> {
     use super::db::schema::task::dsl::{done, task};
 
-    let _ = diesel::update(task.find(id))
+    match diesel::update(task.find(id))
         .set(done.eq(1))
-        .execute(connection)
-        .unwrap_or_else(|_| panic!("Unable to find task {}", id));
-
-    let done_task: models::Task = task
-        .find(id)
-        .first(connection)
-        .unwrap_or_else(|_| panic!("Unable to find task {}", id));
-    println!("Done task: {}", done_task.title);
+        .execute(connection) {
+            Ok(0) => Err("Task ID not found".into()),
+            Ok(1) => {
+                match task.find(id).first::<models::Task>(connection) {
+                    Ok(t) => Ok(format!("task done: {}", t.title)),
+                    Err(_) => Err("could not find task".into()),
+                }
+            },
+            Ok(_) => Ok("Tasks updated".into()),
+            Err(_) => Err("DB query error occurred".into()),
+        }
 }
 
 pub fn del_task(connection: &SqliteConnection, id: i32) {
