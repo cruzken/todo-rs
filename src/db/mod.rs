@@ -35,34 +35,28 @@ pub fn create_task<'a>(
 pub fn done_update_task(connection: &SqliteConnection, id: i32) -> Result<String, String> {
     use super::db::schema::task::dsl::{done, task};
 
-    match diesel::update(task.find(id))
-        .set(done.eq(1))
-        .execute(connection) {
-            Ok(0) => Err("Task ID not found".into()),
-            Ok(1) => {
-                match task.find(id).first::<models::Task>(connection) {
-                    Ok(t) => Ok(format!("task done: {}", t.title)),
-                    Err(_) => Err("could not find task".into()),
-                }
-            },
-            Ok(_) => Ok("Tasks updated".into()),
-            Err(_) => Err("DB query error occurred".into()),
-        }
+    match task.find(id).first::<models::Task>(connection) {
+        Ok(t) => match diesel::update(task.find(id))
+            .set(done.eq(1))
+            .execute(connection)
+        {
+            Ok(_) => Ok(format!("task updated: {}", t.title)),
+            Err(_) => Err("could not find task".into()),
+        },
+        Err(_) => Err("could not find task".into()),
+    }
 }
 
-pub fn del_task(connection: &SqliteConnection, id: i32) {
+pub fn del_task(connection: &SqliteConnection, id: i32) -> Result<String, String> {
     use super::db::schema::task::dsl::task;
 
-    let del_task: models::Task = task
-        .find(id)
-        .first(connection)
-        .unwrap_or_else(|_| panic!("Unable to find task {}", id));
-
-    let _ = diesel::delete(task.find(id))
-        .execute(connection)
-        .unwrap_or_else(|_| panic!("Unable to find task {}", id));
-
-    println!("Deleted task: {}", del_task.title);
+    match task.find(id).first::<models::Task>(connection) {
+        Ok(t) => match diesel::delete(task.find(id)).execute(connection) {
+            Ok(_) => Ok(format!("task deleted: {}", t.title)),
+            Err(_) => Err("DB query error occured".into()),
+        },
+        Err(_) => Err("could not find task".into()),
+    }
 }
 
 pub fn query_task(

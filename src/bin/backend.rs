@@ -3,7 +3,7 @@ use futures::future::Future;
 use serde::Deserialize;
 use std::ops::Deref;
 use todo_rs::db::{
-    create_task, get_connect, init_pool, done_update_task,
+    create_task, del_task, done_update_task, get_connect, init_pool,
     models::{JsonApiResponse, TaskJson},
     query_task, SqlitePool,
 };
@@ -26,7 +26,19 @@ fn done_task(
     pool: web::Data<SqlitePool>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let pool = pool.clone();
-    web::block(move || done_update_task(get_connect(&pool).unwrap().deref(), info.into_inner())).then(
+    web::block(move || done_update_task(get_connect(&pool).unwrap().deref(), info.into_inner()))
+        .then(move |res| match res {
+            Ok(response) => Ok(HttpResponse::Ok().body(format!("success: {}\n", response))),
+            Err(e) => Ok(HttpResponse::Ok().body(format!("error occured: {:?}", e))),
+        })
+}
+
+fn delete_task(
+    info: web::Path<i32>,
+    pool: web::Data<SqlitePool>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let pool = pool.clone();
+    web::block(move || del_task(get_connect(&pool).unwrap().deref(), info.into_inner())).then(
         move |res| match res {
             Ok(response) => Ok(HttpResponse::Ok().body(format!("success: {}\n", response))),
             Err(e) => Ok(HttpResponse::Ok().body(format!("error occured: {:?}", e))),
@@ -65,6 +77,7 @@ fn main() {
             .service(web::resource("/").route(web::get().to_async(index)))
             .service(web::resource("/add").route(web::post().to_async(add_task)))
             .service(web::resource("/done/{id}").route(web::put().to_async(done_task)))
+            .service(web::resource("/delete/{id}").route(web::delete().to_async(delete_task)))
     };
 
     println!("Starting server");

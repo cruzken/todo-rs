@@ -49,7 +49,7 @@ fn done_task(args: &[String]) {
     let id = &args[0].parse::<i32>().expect("Invalid ID");
 
     let conn = establish_connection();
-    done_update_task(&conn, *id);
+    done_update_task(&conn, *id).unwrap();
 }
 
 fn delete_task(args: &[String]) {
@@ -62,7 +62,7 @@ fn delete_task(args: &[String]) {
     let id = &args[0].parse::<i32>().expect("Invalid ID");
 
     let conn = establish_connection();
-    del_task(&conn, *id);
+    del_task(&conn, *id).unwrap();
 }
 
 fn main() {
