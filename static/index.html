@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Todo App</title>
   <script src="https://unpkg.com/vue"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -10,10 +11,12 @@
     {{ message }}
 
     <ul>
-  <li v-for="task in tasks">
-      <p>{{ task.attributes.title}}</p>
-  </li>
+      <li v-for="task in tasks">
+          {{ task.attributes.title}}
+      </li>
     </ul>
+    <input id="taskField" type="text">
+    <button id="button">Add Task</button>
   </div>
 
 
@@ -29,7 +32,23 @@
             this.tasks = response.data.data
           })
         }
-    })
+    });
+
+document.querySelector('#button').addEventListener('click', () => {
+    if (document.querySelector('#taskField').value.length > 0) {
+        let task = document.querySelector('#taskField').value;
+
+        axios.post("./add", {"title": task}).then(response => {
+            console.log(response);
+            return axios.get("./tasks")
+        }).then(response => {
+            console.log(response);
+            app.tasks = response.data.data;
+        });
+        document.querySelector('#taskField').value = '';
+    }
+
+});
   </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-use actix_web::{web, App, Error, HttpResponse, HttpServer};
 use actix_files as fs;
+use actix_web::{web, App, Error, HttpResponse, HttpServer};
 use futures::future::Future;
 use serde::Deserialize;
 use std::ops::Deref;
@@ -16,7 +16,9 @@ fn add_task(
     let pool = pool.clone();
     web::block(move || create_task(get_connect(&pool).unwrap().deref(), &task.title)).then(
         move |res| match res {
-            Ok(_) => Ok(HttpResponse::Ok().body("task added")),
+            Ok(_) => Ok(HttpResponse::Ok()
+                .content_type("plain/text")
+                .body("task added")),
             Err(e) => Ok(HttpResponse::Ok().body(format!("error occured: {:?}", e))),
         },
     )
