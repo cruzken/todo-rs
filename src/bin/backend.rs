@@ -31,7 +31,9 @@ fn done_task(
     let pool = pool.clone();
     web::block(move || done_update_task(get_connect(&pool).unwrap().deref(), info.into_inner()))
         .then(move |res| match res {
-            Ok(response) => Ok(HttpResponse::Ok().content_type("plain/text").body(format!("success: {}\n", response))),
+            Ok(response) => Ok(HttpResponse::Ok()
+                .content_type("plain/text")
+                .body(format!("success: {}\n", response))),
             Err(e) => Ok(HttpResponse::Ok().body(format!("error occured: {:?}", e))),
         })
 }
@@ -43,7 +45,9 @@ fn delete_task(
     let pool = pool.clone();
     web::block(move || del_task(get_connect(&pool).unwrap().deref(), info.into_inner())).then(
         move |res| match res {
-            Ok(response) => Ok(HttpResponse::Ok().body(format!("success: {}\n", response))),
+            Ok(response) => Ok(HttpResponse::Ok()
+                .content_type("plain/text")
+                .body(format!("success: {}\n", response))),
             Err(e) => Ok(HttpResponse::Ok().body(format!("error occured: {:?}", e))),
         },
     )
