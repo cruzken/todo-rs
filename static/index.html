@@ -12,13 +12,20 @@
 
     <ul>
       <li v-for="task in tasks">
-          {{ task.attributes.title}}
+          <span v-if="task.attributes.done == 0">{{ task.attributes.title}}</span>
+          <span v-else class="done">{{ task.attributes.title}}</span>
       </li>
     </ul>
     <input id="taskField" type="text">
     <button id="button">Add Task</button>
   </div>
 
+<style>
+.done {
+    text-decoration: line-through;
+    opacity: 0.4;
+}
+</style>
 
   <script>
     var app = new Vue({
