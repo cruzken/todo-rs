@@ -1,76 +1,92 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Todo App</title>
-  <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-</head>
-<body>
-  <div id="app">
-    {{ message }}
-
-    <ul>
-      <li v-for="task in tasks">
-          <span v-if="task.attributes.done == 0">{{ task.attributes.title}}<button v-on:click="done(task.id)">Done</button></span>
-          <span v-else class="done">{{ task.attributes.title}}</span>
-          <button v-on:click="del(task.id)">Delete</button>
-      </li>
-    </ul>
-    <input id="taskField" v-model="inputField" type="text" placeholder="Enter a task">
-    <button id="button" v-on:click="addTask">Add Task</button>
-  </div>
-
-<style>
-.done {
-    text-decoration: line-through;
-    opacity: 0.4;
-}
-</style>
-
-  <script>
-    var app = new Vue({
-      el: '#app',
-      data: {
-        message: 'Tasks Listed:',
-        tasks: [],
-          inputField: ''
-      },
-        mounted() {
-              axios.get("./tasks").then(response => {
-                this.tasks = response.data.data
-              })
-        },
-        methods: {
-            done: function (id) {
-                axios.put("./done/" + id).then(response => {
-                    return axios.get("./tasks");
-                }).then(response => {
-                    this.tasks = response.data.data;
-                })
-            },
-            addTask: function() {
-                if (this.inputField.trim().length > 0) {
-                    let task = this.inputField;
-                    axios.post("./add", {"title": task}).then(response => {
-                        console.log(response);
-                        return axios.get("./tasks")
-                    }).then(response => {
-                        console.log(response);
-                        this.tasks = response.data.data;
-                    });
-                }
-                this.inputField = '';
-            },
-            del: function(id) {
-                axios.delete("./delete/" + id).then(response => {
-                    return axios.get("./tasks");
-                }).then(response => {
-                    this.tasks = response.data.data;
-                })
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Todo App</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+        <script src="https://unpkg.com/vue"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <section class="section">
+            <div id="app" class="container is-tablet">
+            <h1 class="title">{{ message }}</h1>
+            <div class="columns is-mobile" v-for="task in tasks">
+                <div class=column>
+                    <span v-if="task.attributes.done == 0">{{ task.attributes.title}}</span>
+                    <span v-else class="done">{{ task.attributes.title}}</span>
+                </div>
+                <div class="column is-narrow">
+                    <button v-if="task.attributes.done == 0" class="button is-success" v-on:click="done(task.id)">Done</button>
+                </div>
+                <div class="column is-narrow">
+                    <button class="button is-danger" v-on:click="del(task.id)">Delete</button>
+                </div>
+            </div>
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <input id="taskField" class="input" v-model="inputField" type="text" placeholder="Enter a task">
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <button id="button" class="button is-primary" v-on:click="addTask">Add Task</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <style>
+            .done {
+            text-decoration: line-through;
+            opacity: 0.4;
             }
-        }
-    });
-  </script>
-</body>
+        </style>
+        <script>
+            var app = new Vue({
+              el: '#app',
+              data: {
+                message: 'Tasks Listed:',
+                tasks: [],
+                  inputField: ''
+              },
+                mounted() {
+                      axios.get("./tasks").then(response => {
+                        this.tasks = response.data.data
+                      })
+                },
+                methods: {
+                    done: function (id) {
+                        axios.put("./done/" + id).then(response => {
+                            return axios.get("./tasks");
+                        }).then(response => {
+                            this.tasks = response.data.data;
+                        })
+                    },
+                    addTask: function() {
+                        if (this.inputField.trim().length > 0) {
+                            let task = this.inputField;
+                            axios.post("./add", {"title": task}).then(response => {
+                                console.log(response);
+                                return axios.get("./tasks")
+                            }).then(response => {
+                                console.log(response);
+                                this.tasks = response.data.data;
+                            });
+                        }
+                        this.inputField = '';
+                    },
+                    del: function(id) {
+                        axios.delete("./delete/" + id).then(response => {
+                            return axios.get("./tasks");
+                        }).then(response => {
+                            this.tasks = response.data.data;
+                        })
+                    }
+                }
+            });
+        </script>
+    </body>
 </html>
+
