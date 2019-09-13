@@ -1,5 +1,5 @@
-/target
+app/target
 **/*.rs.bk
-Cargo.lock
+app/Cargo.lock
 .env
-testdb.sqlite3
+app/testdb.sqlite3
