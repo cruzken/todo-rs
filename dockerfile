@@ -12,3 +12,9 @@ COPY app/Cargo.* ./
 
 # Build dependencies
 RUN cargo build --release
+
+# Copy sources and build release
+RUN rm -r src
+RUN rm -r target/release/deps/todo*
+COPY app/src ./src
+RUN cargo build --release
