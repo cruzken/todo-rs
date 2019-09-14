@@ -90,7 +90,7 @@ fn main() {
 
     println!("Starting server at http://localhost:8088/");
     HttpServer::new(app)
-        .bind("localhost:8088")
+        .bind("0.0.0.0:8088")
         .unwrap()
         .run()
         .unwrap();
