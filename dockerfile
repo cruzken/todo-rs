@@ -33,4 +33,6 @@ COPY app/static /todo/static
 # Expose required port
 EXPOSE 8088
 
+# Run the server
 WORKDIR /todo
+ENTRYPOINT ["./backend"]
