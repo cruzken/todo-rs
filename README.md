@@ -7,7 +7,7 @@ The image has been pushed to [Dockerhub](https://hub.docker.com/r/cruzken/todo/)
 So you can just:
 
 ```
-docker pull cswl/xampp
+docker pull cruzken/todo
 ```
 ## Running the image:
 - Run the Docker container: `docker run -p 8088:8088 --rm --name todo cruzken/todo`
