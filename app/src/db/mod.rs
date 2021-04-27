@@ -23,9 +23,10 @@ pub fn establish_connection() -> SqliteConnection {
 
 pub fn create_task<'a>(
     connection: &SqliteConnection,
-    title: &'a str,
+    user: &'a str,
+    title: &'a str
 ) -> Result<usize, diesel::result::Error> {
-    let task = models::NewTask { title, done: 0 };
+    let task = models::NewTask { title, user, done: 0 };
 
     diesel::insert_into(schema::task::table)
         .values(&task)
@@ -60,7 +61,8 @@ pub fn del_task(connection: &SqliteConnection, id: i32) -> Result<String, String
 }
 
 pub fn query_task(
-    connection: &SqliteConnection,
+    connection: &SqliteConnection, query_user: &str 
 ) -> Result<Vec<models::Task>, diesel::result::Error> {
-    schema::task::table.load::<models::Task>(&*connection)
+    use schema::task::dsl::user;
+    schema::task::table.filter(user.eq(query_user)).load::<models::Task>(&*connection)
 }

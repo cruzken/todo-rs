@@ -3,39 +3,46 @@ use todo_rs::db::{create_task, del_task, done_update_task, establish_connection,
 
 fn help() {
     println!("subcommands");
-    println!("    new<title>: create a new task");
-    println!("    show: show all tasks");
+    println!("    new<title, user>: create a new task");
+    println!("    show<user>: show all tasks from user");
     println!("    done<id>: mark task done");
     println!("    delete<id>: delete task");
 }
 
 fn new_task(args: &[String]) {
-    if args.len() < 1 {
-        println!("new: missing <title>");
+    if args.len() < 2 {
+        println!("new: missing <title, user>");
         help();
         return;
     }
 
     let conn = establish_connection();
-    create_task(&conn, &args[0]).unwrap();
+    create_task(&conn, &args[0], &args[1]).unwrap();
 }
 
 fn show_tasks(args: &[String]) {
-    if args.len() > 0 {
+    if args.len() < 1 {
+        println!("show: missing<user>");
+        return;
+    }
+
+    if args.len() > 1 {
         println!("show: unexpected argument");
         help();
         return;
     }
 
+    let user = &args[0];
+
     let conn = establish_connection();
     println!("TASKS\n-----");
-    for task in query_task(&conn).unwrap() {
+    for task in query_task(&conn, user).unwrap() {
         let status = match task.done {
             0 => "Pending",
             1 => "Done",
             _ => "Unknown",
         };
-        println!("{}. {} - {}", task.id, task.title, status);
+        println!("{}. {} {} - {}", task.id, task.user, task.title, status);
     }
 }
 

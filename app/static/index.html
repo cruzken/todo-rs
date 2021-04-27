@@ -44,7 +44,13 @@
             }
         </style>
         <script>
-            var app = new Vue({
+            let user = localStorage.getItem("todo-user");
+            if (!user) {
+              user = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+              localStorage.setItem("todo-user", user);
+            }
+
+            const app = new Vue({
               el: '#app',
               data: {
                 message: 'Tasks Listed:',
@@ -52,14 +58,14 @@
                   inputField: ''
               },
                 mounted() {
-                      axios.get("./tasks").then(response => {
+                      axios.get("./tasks/" + user).then(response => {
                         this.tasks = response.data.data
                       })
                 },
                 methods: {
                     done: function (id) {
                         axios.put("./done/" + id).then(response => {
-                            return axios.get("./tasks");
+                            return axios.get("./tasks/" + user);
                         }).then(response => {
                             this.tasks = response.data.data;
                         })
@@ -67,9 +73,9 @@
                     addTask: function() {
                         if (this.inputField.trim().length > 0) {
                             let task = this.inputField;
-                            axios.post("./add", {"title": task}).then(response => {
+                            axios.post("./add", {"title": task, "user": user}).then(response => {
                                 console.log(response);
-                                return axios.get("./tasks")
+                                return axios.get("./tasks/" + user)
                             }).then(response => {
                                 console.log(response);
                                 this.tasks = response.data.data;
@@ -79,7 +85,7 @@
                     },
                     del: function(id) {
                         axios.delete("./delete/" + id).then(response => {
-                            return axios.get("./tasks");
+                            return axios.get("./tasks/" + user);
                         }).then(response => {
                             this.tasks = response.data.data;
                         })

@@ -14,7 +14,7 @@ fn add_task(
     task: web::Json<JsonPostTask>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     let pool = pool.clone();
-    web::block(move || create_task(get_connect(&pool).unwrap().deref(), &task.title)).then(
+    web::block(move || create_task(get_connect(&pool).unwrap().deref(), &task.user, &task.title)).then(
         move |res| match res {
             Ok(_) => Ok(HttpResponse::Ok()
                 .content_type("plain/text")
@@ -56,21 +56,25 @@ fn delete_task(
 #[derive(Deserialize)]
 pub struct JsonPostTask {
     pub title: String,
+    pub user: String
 }
 
-fn tasks(pool: web::Data<SqlitePool>) -> impl Future<Item = HttpResponse, Error = Error> {
+fn tasks(
+    info: web::Path<String>,
+    pool: web::Data<SqlitePool>
+    ) -> impl Future<Item = HttpResponse, Error = Error> {
     let pool = pool.clone();
 
     let mut response = JsonApiResponse { data: vec![] };
 
-    web::block(move || query_task(get_connect(&pool).unwrap().deref()))
+    web::block(move || query_task(get_connect(&pool).unwrap().deref(), &info.into_inner()))
         .from_err()
         .then(move |res| match res {
             Ok(tasks) => {
                 for task in tasks {
                     response.data.push(TaskJson::new(task));
                 }
-                return Ok(HttpResponse::Ok().json(response));
+                Ok(HttpResponse::Ok().json(response))
             }
             Err(e) => Err(e),
         })
@@ -81,7 +85,7 @@ fn main() {
     let app = move || {
         App::new()
             .data(pool.clone())
-            .service(web::resource("/tasks").route(web::get().to_async(tasks)))
+            .service(web::resource("/tasks/{user}").route(web::get().to_async(tasks)))
             .service(web::resource("/add").route(web::post().to_async(add_task)))
             .service(web::resource("/done/{id}").route(web::put().to_async(done_task)))
             .service(web::resource("/delete/{id}").route(web::delete().to_async(delete_task)))

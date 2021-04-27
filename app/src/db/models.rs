@@ -5,6 +5,7 @@ use serde::Serialize;
 #[table_name = "task"]
 pub struct NewTask<'a> {
     pub title: &'a str,
+    pub user: &'a str,
     pub done: i32,
 }
 
@@ -12,6 +13,7 @@ pub struct NewTask<'a> {
 pub struct Task {
     pub id: i32,
     pub title: String,
+    pub user: String,
     pub done: i32,
 }
 
@@ -33,7 +35,7 @@ impl TaskJson {
         TaskJson {
             id: task.id,
             type_json: "Task".into(),
-            attributes: TaskAttributes { title: task.title, done: task.done}
+            attributes: TaskAttributes { title: task.title, user: task.user, done: task.done}
         }
     }
 }
@@ -41,5 +43,6 @@ impl TaskJson {
 #[derive(Serialize)]
 pub struct TaskAttributes {
     pub title: String,
+    pub user: String,
     pub done: i32,
 }
