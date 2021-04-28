@@ -10,7 +10,7 @@ So you can just:
 docker pull kencruz/todo-rs
 ```
 ## Running the image:
-- Run the Docker container: `docker run -p 8088:8088 --rm --name todo cruzken/todo`
+- Run the Docker container: `docker run -p 8088:8088 --rm --name todo kencruz/todo-rs`
 - Goto [http://localhost:8088](http://localhost:8088)
 
 ## Building the image from source.:
@@ -18,12 +18,12 @@ docker pull kencruz/todo-rs
 - First, clone this project.
 
 ```
-$ git clone https://github.com/cruzken/todo-rs.git
+$ git clone https://github.com/kencruz/todo-rs.git
 ```
 
 - Second, change directory to the just now cloned repository.
 
 ```
-$ docker build -t cruzken/todo .
+$ docker build -t kencruz/todo-rs .
 ```
 
