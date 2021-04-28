@@ -3,11 +3,11 @@
 A todo app written in Rust, using Actix, Diesel and SQLite. Frontend uses Vue, Axios, and Bulma. A live demonstration can be seen [here.](http://todo.kencruz.ca)
 
 ## Getting the image:
-The image has been pushed to [Dockerhub](https://hub.docker.com/r/cruzken/todo/)  
+The image has been pushed to [Dockerhub](https://hub.docker.com/r/kencruz/todo-rs/)  
 So you can just:
 
 ```
-docker pull cruzken/todo
+docker pull kencruz/todo-rs
 ```
 ## Running the image:
 - Run the Docker container: `docker run -p 8088:8088 --rm --name todo cruzken/todo`
